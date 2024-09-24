@@ -1,0 +1,21 @@
+Name: lizardServer
+Host: 0.0.0.0
+Port: 7138
+Timeout: 60000
+Log:
+  Encoding: plain
+  Level: debug
+Prometheus:
+  Host: 0.0.0.0
+  Port: 17138
+  Path: /metrics
+Etcd:
+  Address: 10.50.89.17:8089
+Sqlite: ./lizardrestic.db
+ServicePrefix: backup-
+Rpc:
+  Timeout: 2000 # millisecond
+  KeepaliveTime: 600 # seconds
+  RetryInterval: 600 # seconds
+ConfigurationDir: ./configuration
+CacheDir: ./cache

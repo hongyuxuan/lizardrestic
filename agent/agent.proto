@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package agent;
+
+option go_package = "./agent";
+
+message SetEnvironmentRequest {
+  string repo_url = 1;
+  string s3_access_key = 2;
+  string s3_secret_key = 3;
+  string password = 4;
+}
+message CreatePolicyRequest {
+  uint32 policy_id = 1;
+  repeated string backup_dir = 2;
+}
+message BackupRequest {
+  uint32 policy_id = 1;
+  string repo_url = 2;
+  string host = 3;
+  repeated string tags = 4;
+  string exclude = 5;
+}
+message RestoreRequest {
+  string repo_url = 1;
+  string snapshot_id = 2;
+  string host = 3;
+  repeated string tags = 4;
+  string exclude = 5;
+  string target = 6;
+}
+message Response {
+  uint32 code = 1;
+  string message = 2;
+  bytes  data = 3;
+}
+
+service LizardAgent {
+  rpc setEnvironment(SetEnvironmentRequest) returns(Response);
+  rpc createPolicy(CreatePolicyRequest) returns(Response);
+  rpc backup(BackupRequest) returns(stream Response);
+  rpc restore(RestoreRequest) returns(stream Response);
+}

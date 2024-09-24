@@ -1,0 +1,188 @@
+info (
+	author: "hongyx2014@126.com"
+	date: "2024-08-26"
+	desc: "lizardrestic企业级备份平台API"
+	version: "v1.0.0"
+)
+
+import (
+	"apis/db.api"
+)
+
+type (
+	Response {
+		Code    int         `json:"code"`
+		Data    interface{} `json:"data,omitempty"`
+		Message string      `json:"message,omitempty"`
+	}
+	GetServiceReq {
+		ServiceName string `path:"service_name"`
+	}
+	CreateRepoReq {
+		RepoName    string `json:"repo_name"`
+		RepoUrl     string `json:"repo_url"`
+		S3AccessKey string `json:"s3_access_key"`
+		S3SecretKey string `json:"s3_secret_key"`
+		Password    string `json:"password"`
+	}
+	StatsRepoReq {
+		RepoUrl string `form:"repo_url"`
+	}
+	BackupReq {
+		PolicyId int `form:"policy_id"`
+	}
+	SavePolicyReq {
+		Id           int      `json:"id,optional"`
+		Name         string   `json:"name"`
+		RepositoryId int      `json:"repository_id"`
+		Hosts        []string `json:"hosts"`
+		Cron         string   `json:"cron"`
+		BackupDir    string   `json:"backup_dir"`
+		Tags         []string `json:"tags,optional"`
+		Enable       bool     `json:"enable"`
+		Exclude      string   `json:"exclude,optional"`
+		Retention    string   `json:"retention"`
+	}
+	ListSnapshotReq {
+		PolicyId int    `path:"policy_id"`
+		Host     string `form:"host"`
+		Tag      string `form:"tag,optional"`
+		Latest   string `form:"latest,optional"`
+	}
+	SnapshotsIdsReq {
+		Ids     []string `json:"ids"`
+		RepoUrl string   `json:"repo_url"`
+	}
+	FindSnapshotsReq {
+		RepoUrl    string `form:"repo_url"`
+		SnapshotId string `form:"snapshot_id,optional"`
+		Host       string `form:"host"`
+		Tag        string `form:"tag,optional"`
+		Path       string `form:"path,optional"`
+		Pattern    string `form:"pattern"`
+	}
+	LsSnapshotsReq {
+		RepoUrl    string `form:"repo_url"`
+		SnapshotId string `form:"snapshot_id"`
+		Host       string `form:"host"`
+		Dir        string `form:"dir"`
+		Tag        string `form:"tag,optional"`
+	}
+	ListHistoryReq {
+		PolicyName string `form:"policy_name,optional"`
+		Page       int    `form:"page,default=1"`
+		Size       int    `form:"size,default=20"`
+		Search     string `form:"search,optional"`
+		Filter     string `form:"filter,optional"`
+		Range      string `form:"range,optional"`
+		Sort       string `form:"sort,optional"`
+	}
+	RestoreReq {
+		PolicyId   int    `json:"policy_id"`
+		SnapshotId string `json:"snapshot_id"`
+		Host       string `json:"host"`
+		Exclude    string `json:"exclude,optional"`
+		Target     string `json:"target"`
+	}
+)
+@server(
+	prefix: /restic
+	group: restic
+)
+service resticServer {
+	@doc(
+		summary: 获取当前应用版本
+	)
+	@handler version
+	get /version returns (string)
+	
+	@doc(
+		summary: 获取注册的服务列表
+	)
+	@handler listservices
+	get /services returns (Response)
+	
+	@doc(
+		summary: 获取注册的服务详情
+	)
+	@handler getservice
+	get /services/:service_name (GetServiceReq) returns (Response)
+	
+	@doc(
+		summary: 获取注册的虚拟机IP
+	)
+	@handler listtargets
+	get /targets returns (Response)
+	
+	@doc(
+		summary: 新建仓库
+	)
+	@handler createrepo
+	post /repository (CreateRepoReq) returns (Response)
+	
+	@doc(
+		summary: 获取仓库统计信息
+	)
+	@handler statsrepo
+	get /repository/stats (StatsRepoReq) returns (Response)
+	
+	@doc(
+		summary: 执行backup操作
+	)
+	@handler backup
+	post /backup (BackupReq) returns (Response)
+	
+	@doc(
+		summary: 创建/保存备份策略
+	)
+	@handler savepolicy
+	post /backup/policy (SavePolicyReq) returns (Response)
+	
+	@doc(
+		summary: 删除备份策略
+	)
+	@handler deletepolicy
+	delete /backup/policy (BackupReq) returns (Response)
+	
+	@doc(
+		summary: 列出cron
+	)
+	@handler listcrons
+	get /crons returns (Response)
+	
+	@doc(
+		summary: 列出快照
+	)
+	@handler listsnapshots
+	get /backup/policy/:policy_id/snapshots (ListSnapshotReq) returns (Response)
+	
+	@doc(
+		summary: 删除快照
+	)
+	@handler deletesnapshots
+	delete /snapshots (SnapshotsIdsReq) returns (Response)
+	
+	@doc(
+		summary: 从快照中查找文件
+	)
+	@handler findsnapshots
+	get /snapshots/find (FindSnapshotsReq) returns (Response)
+	
+	@doc(
+		summary: 列出快照中的文件
+	)
+	@handler lssnapshots
+	get /snapshots/ls (LsSnapshotsReq) returns (Response)
+	
+	@doc(
+		summary: 列出任务记录
+	)
+	@handler listhistory
+	get /backup/history (ListHistoryReq) returns (Response)
+	
+	@doc(
+		summary: 恢复快照
+	)
+	@handler restore
+	post /backup/restore (RestoreReq) returns (Response)
+}

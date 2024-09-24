@@ -1,0 +1,17 @@
+Name: lizardAgent
+ListenOn: 0.0.0.0:7038
+Timeout: 60000
+Log:
+  Encoding: plain
+  Level: info 
+Prometheus:
+  Host: 0.0.0.0
+  Port: 17038
+  Path: /metrics
+Etcd:
+  Hosts:
+  - 10.50.89.17:2379
+  Key: lizardrestic-agent.default.127.0.0.1
+ServicePrefix: backup-
+ConfigurationDir: ./configuration
+CacheDir: ./cache

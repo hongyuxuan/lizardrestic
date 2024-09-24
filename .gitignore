@@ -1,0 +1,7 @@
+*.exe
+**/bin
+*.db
+*.log
+**/logs
+**/cache
+**/configuration
